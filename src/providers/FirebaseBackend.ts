@@ -53,6 +53,38 @@ export class FirebaseBackend extends Backend {
             });
     }
 
+    public register(username: string, email: string, password: string): Promise<User> {
+
+        let authUser: FirebaseUser;
+
+        return FirebaseSDK
+            .auth()
+            .createUserWithEmailAndPassword(email, password)
+            .then((user: FirebaseUser) => {
+                authUser = user;
+                return FirebaseSDK
+                    .firestore()
+                    .collection('users')
+                    .add({
+                        username: username,
+                        auth_id: user.uid
+                    });
+            })
+            .then((reference: Firestore.DocumentReference) => {
+                return reference.get();
+            })
+            .then((snapshot: Firestore.DocumentSnapshot) => {
+                return this.modelsFactory.makeUser(snapshot);
+            })
+            .catch((error) => {
+                return (
+                    authUser ? authUser.delete() : Promise.resolve()
+                ).then(() => {
+                    throw new Error(error.message);
+                });
+            });
+    }
+
 }
 
 class ModelsFactory {

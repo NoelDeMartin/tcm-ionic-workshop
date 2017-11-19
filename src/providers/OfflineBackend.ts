@@ -32,6 +32,10 @@ export class OfflineBackend extends Backend {
         return Promise.resolve(this.user = this.createUserStub());
     }
 
+    public register(username: string, email: string, password: string): Promise<User> {
+        return Promise.resolve(this.user = this.createUserStub(username));
+    }
+
     private generateId(): string {
         return (Math.random() * 100000).toString();
     }
