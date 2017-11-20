@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 
+import moment   from 'moment';
+
 import { User } from '../models/User';
+import { Room } from '../models/Room';
 
 import { Backend }  from './Backend';
 
@@ -13,9 +16,9 @@ export class OfflineBackend extends Backend {
 
         // Use this to generate stubs
 
-        /*
         this.user = this.createUserStub();
 
+        /*
         let john = this.createUserStub('John Doe');
 
         this.createRoom(this.user, 'Welcome!', [john.authId])
@@ -40,12 +43,25 @@ export class OfflineBackend extends Backend {
         return Promise.resolve(this.user = this.createUserStub(username));
     }
 
+    public findUsersByUsername(usernames: string[]): Promise<User[]> {
+        return Promise.resolve([]);
+    }
+
+    public createRoom(user: User, topic: string, members: string[]): Promise<Room> {
+        let room = this.createRoomStub(topic, members);
+        return Promise.resolve(room);
+    }
+
     private generateId(): string {
         return (Math.random() * 100000).toString();
     }
 
     private createUserStub(username: string = 'guest'): User {
         return new User(this.generateId(), this.generateId(), username);
+    }
+
+    private createRoomStub(topic: string, members: string[] = []): Room {
+        return new Room(this.generateId(), topic, moment(), members);
     }
 
 }

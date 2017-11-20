@@ -1,4 +1,5 @@
 import { User } from '../models/User';
+import { Room } from '../models/Room';
 
 export abstract class Backend {
 
@@ -9,5 +10,9 @@ export abstract class Backend {
     abstract login(email: string, password: string): Promise<User>;
 
     abstract register(username: string, email: string, password: string): Promise<User>;
+
+    abstract findUsersByUsername(usernames: string[]): Promise<User[]>;
+
+    abstract createRoom(user: User, topic: string, members: string[]): Promise<Room>;
 
 }

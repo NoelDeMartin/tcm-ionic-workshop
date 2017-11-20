@@ -7,7 +7,8 @@ import {
 } from 'firebase';
 import 'firebase/firestore';
 
-import { User }     from '../models/User';
+import { User } from '../models/User';
+import { Room } from '../models/Room';
 
 import { Backend }  from './Backend';
 
@@ -112,6 +113,80 @@ export class FirebaseBackend extends Backend {
             });
     }
 
+    public findUsersByUsername(usernames: string[]): Promise<User[]> {
+        return this.findUsers('username', usernames);
+    }
+
+    public createRoom(user: User, topic: string, members: string[]): Promise<Room> {
+
+        let firebaseMembers = {};
+
+        for (let member of members) {
+            firebaseMembers[member] = true;
+        }
+
+        return FirebaseSDK
+            .firestore()
+            .collection('rooms')
+            .add({
+                topic: topic,
+                owner: user.authId,
+                members: firebaseMembers,
+                created_at: new Date(),
+                last_active_at: new Date()
+            })
+            .then((reference: Firestore.DocumentReference) => {
+                return reference.get();
+            })
+            .then((snapshot: Firestore.DocumentSnapshot) => {
+                return this.modelsFactory.makeRoom(snapshot);
+            })
+            .catch((error) => {
+                throw new Error(error.message);
+            });
+    }
+
+    private findUsers(field: string, values: any[]): Promise<User[]> {
+        return new Promise<User[]>((resolve, reject) => {
+
+            let count = values.length;
+            let users: User[] = [];
+
+            for (let value of values) {
+
+                // This would seem to have bad performance, but since firebase pipelines requests
+                // this is actually the way to do it
+                // +info: https://stackoverflow.com/questions/35931526/speed-up-fetching-posts-for-my-social-network-app-by-using-query-instead-of-obse/35932786#35932786
+
+                FirebaseSDK
+                    .firestore()
+                    .collection('users')
+                    .where(field, '==', value)
+                    .get()
+                    .then((snapshot: Firestore.QuerySnapshot) => {
+
+                        users = users.concat(
+                            snapshot.docs.map((document: Firestore.DocumentSnapshot) => {
+                                return this.modelsFactory.makeUser(document);
+                            })
+                        );
+
+                        if (--count == 0) {
+                            resolve(users);
+                        }
+
+                    })
+                    .catch(() => {
+                        if (--count == 0) {
+                            resolve(users);
+                        }
+                    });
+
+            }
+
+        });
+    }
+
 }
 
 class ModelsFactory {
@@ -128,6 +203,11 @@ class ModelsFactory {
         this.users[user.authId] = user;
 
         return user;
+    }
+
+    public makeRoom(snapshot: Firestore.DocumentSnapshot): Room {
+        let data = snapshot.data();
+        return new Room(snapshot.id, data['topic'], data['last_active_at'], Object.keys(data['members']));
     }
 
     public getUser(id: string): User {
