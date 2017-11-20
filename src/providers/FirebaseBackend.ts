@@ -32,6 +32,33 @@ export class FirebaseBackend extends Backend {
         });
     }
 
+    public getCurrentUser(): Promise<User | null> {
+        return new Promise((resolve, reject) => {
+
+            let currentUser = FirebaseSDK.auth().currentUser;
+
+            if (!currentUser) {
+                resolve(null);
+            } else if (this.modelsFactory.hasLoadedUser(currentUser.uid)) {
+                resolve(this.modelsFactory.getUser(currentUser.uid));
+            } else {
+                FirebaseSDK
+                    .firestore()
+                    .collection('users')
+                    .where('auth_id', '==', currentUser.uid)
+                    .get()
+                    .then((snapshot: Firestore.QuerySnapshot) => {
+                        resolve(
+                            snapshot.docs.length > 0
+                                ? this.modelsFactory.makeUser(snapshot.docs[0])
+                                : null
+                        );
+                    });
+            }
+
+        });
+    }
+
     public login(email: string, password: string): Promise<User> {
         return FirebaseSDK
             .auth()
@@ -101,6 +128,14 @@ class ModelsFactory {
         this.users[user.authId] = user;
 
         return user;
+    }
+
+    public getUser(id: string): User {
+        return this.users[id];
+    }
+
+    public hasLoadedUser(id: string): boolean {
+        return id in this.users;
     }
 
 }

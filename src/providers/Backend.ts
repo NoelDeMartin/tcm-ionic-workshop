@@ -4,6 +4,8 @@ export abstract class Backend {
 
     abstract init(): Promise<void>;
 
+    abstract getCurrentUser(): Promise<User | null>;
+
     abstract login(email: string, password: string): Promise<User>;
 
     abstract register(username: string, email: string, password: string): Promise<User>;

@@ -28,6 +28,10 @@ export class OfflineBackend extends Backend {
         return Promise.resolve();
     }
 
+    public getCurrentUser(): Promise<User | null> {
+        return Promise.resolve(this.user);
+    }
+
     public login(email: string, password: string): Promise<User> {
         return Promise.resolve(this.user = this.createUserStub());
     }
