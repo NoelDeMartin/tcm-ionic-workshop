@@ -1,0 +1,12 @@
+page-splash {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    background: color($colors, 'primary');
+
+    & > ion-spinner {
+        width: 20vw;
+        height: 20vw;
+    }
+
+}

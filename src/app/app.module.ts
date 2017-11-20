@@ -16,6 +16,7 @@ import { StatusBar }    from '@ionic-native/status-bar';
 
 import { HomePage }     from '../pages/home/home';
 import { LoginPage }    from '../pages/login/login';
+import { SplashPage }   from '../pages/splash/splash';
 import { RegisterPage } from '../pages/register/register';
 
 import { Page } from '../components/page/page';
@@ -37,6 +38,7 @@ let useOfflineBackend: boolean = true;
         MyApp,
         HomePage,
         LoginPage,
+        SplashPage,
         RegisterPage,
     ],
     imports: [
@@ -49,6 +51,7 @@ let useOfflineBackend: boolean = true;
         MyApp,
         HomePage,
         LoginPage,
+        SplashPage,
         RegisterPage,
     ],
     providers: [
