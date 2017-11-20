@@ -19,4 +19,12 @@ export class Auth {
             });
     }
 
+    public register(username: string, email: string, password: string): Promise<void> {
+        return this.backend
+            .register(username, email, password)
+            .then((user: User) => {
+                this.user = user;
+            });
+    }
+
 }

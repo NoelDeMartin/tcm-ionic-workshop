@@ -12,8 +12,9 @@ import {
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar }    from '@ionic-native/status-bar';
 
-import { HomePage }   from '../pages/home/home';
-import { LoginPage }  from '../pages/login/login';
+import { HomePage }     from '../pages/home/home';
+import { LoginPage }    from '../pages/login/login';
+import { RegisterPage } from '../pages/register/register';
 
 import { Auth }             from '../providers/Auth';
 import { Backend }          from '../providers/Backend';
@@ -29,6 +30,7 @@ let useOfflineBackend: boolean = true;
         MyApp,
         HomePage,
         LoginPage,
+        RegisterPage,
     ],
     imports: [
         BrowserModule,
@@ -39,6 +41,7 @@ let useOfflineBackend: boolean = true;
         MyApp,
         HomePage,
         LoginPage,
+        RegisterPage,
     ],
     providers: [
         Auth,

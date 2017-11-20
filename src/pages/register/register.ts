@@ -8,17 +8,18 @@ import {
 
 import { Auth } from '../../providers/Auth';
 
-import { HomePage }     from '../home/home';
-import { RegisterPage } from '../register/register';
+import { HomePage } from '../home/home';
 
 @Component({
-    selector: 'page-login',
-    templateUrl: 'login.html'
+    selector: 'page-register',
+    templateUrl: 'register.html'
 })
-export class LoginPage {
+export class RegisterPage {
 
-    email: string = '';
-    password: string = '';
+    private username: string = '';
+    private email: string = '';
+    private password: string = '';
+    private password_confirmation: string = '';
 
     constructor(
         private auth: Auth,
@@ -29,11 +30,20 @@ export class LoginPage {
 
     public submit(): void {
 
+        if (!this.valid()) {
+            this.showError('Invalid credentials');
+            return;
+        }
+
         let loader = this.loadingCtrl.create();
         loader.present();
 
         this.auth
-            .login(this.email, this.password)
+            .register(
+                this.username,
+                this.email,
+                this.password
+            )
             .then(() => {
                 loader.dismiss();
                 this.navCtrl.setRoot(HomePage);
@@ -45,8 +55,11 @@ export class LoginPage {
 
     }
 
-    public register(): void {
-        this.navCtrl.push(RegisterPage);
+    private valid(): boolean {
+        return this.username.length > 0 &&
+                this.email.length > 8 &&
+                this.password.length > 8 &&
+                this.password == this.password_confirmation;
     }
 
     private showError(message: string) {
