@@ -19,9 +19,13 @@ import { LoginPage }    from '../pages/login/login';
 import { SplashPage }   from '../pages/splash/splash';
 import { RegisterPage } from '../pages/register/register';
 
-import { Page } from '../components/page/page';
+import { CreateRoomModal }  from '../modals/create-room/create-room';
+
+import { Page }     from '../components/page/page';
+import { Modal }    from '../components/modal/modal';
 
 import { Auth }             from '../providers/Auth';
+import { Chat }             from '../providers/Chat';
 import { Backend }          from '../providers/Backend';
 import { FirebaseBackend }  from '../providers/FirebaseBackend';
 import { OfflineBackend }   from '../providers/OfflineBackend';
@@ -35,11 +39,13 @@ let useOfflineBackend: boolean = true;
 @NgModule({
     declarations: [
         Page,
+        Modal,
         MyApp,
         HomePage,
         LoginPage,
         SplashPage,
         RegisterPage,
+        CreateRoomModal,
     ],
     imports: [
         BrowserModule,
@@ -48,15 +54,18 @@ let useOfflineBackend: boolean = true;
     bootstrap: [IonicApp],
     entryComponents: [
         Page,
+        Modal,
         MyApp,
         HomePage,
         LoginPage,
         SplashPage,
         RegisterPage,
+        CreateRoomModal,
     ],
     providers: [
         { provide: APP_INITIALIZER, useFactory: registerInjector, deps: [Injector], multi: true },
         Auth,
+        Chat,
         StatusBar,
         SplashScreen,
         { provide: ErrorHandler, useClass: IonicErrorHandler },

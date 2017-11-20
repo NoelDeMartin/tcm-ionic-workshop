@@ -1,6 +1,7 @@
 import {
     Loading,
     AlertController,
+    ModalController,
     LoadingController,
 } from 'ionic-angular';
 
@@ -10,6 +11,7 @@ class UI {
 
     private loader: Loading;
     private alertCtrl: AlertController;
+    private modalCtrl: ModalController;
     private loadingCtrl: LoadingController;
 
     asyncOperation(promise: Promise<any>): Promise<any> {
@@ -63,6 +65,16 @@ class UI {
             message: message,
             buttons: ['OK']
         }).present();
+
+    }
+
+    public showModal(modal: any): void {
+
+        if (!this.modalCtrl) {
+            this.modalCtrl = resolveDependency(ModalController);
+        }
+
+        this.modalCtrl.create(modal).present();
 
     }
 
