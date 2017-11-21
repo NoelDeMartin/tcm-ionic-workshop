@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 
 import moment   from 'moment';
 
+import { Observable }   from 'rxjs/Observable';
+import { BehaviorSubject }  from 'rxjs/BehaviorSubject';
+
 import { User } from '../models/User';
 import { Room } from '../models/Room';
 
@@ -11,6 +14,7 @@ import { Backend }  from './Backend';
 export class OfflineBackend extends Backend {
 
     private user: User = null;
+    private roomsSubject: BehaviorSubject<Room[]> = new BehaviorSubject([]);
 
     public init(): Promise<void> {
 
@@ -18,10 +22,11 @@ export class OfflineBackend extends Backend {
 
         this.user = this.createUserStub();
 
-        /*
         let john = this.createUserStub('John Doe');
 
         this.createRoom(this.user, 'Welcome!', [john.authId])
+
+        /*
             .then((room: Room) => {
                 this.sendMessage(room, john, 'Hi there I am jhon');
                 this.sendMessage(room, this.user, 'Hi there I am guest');
@@ -49,7 +54,16 @@ export class OfflineBackend extends Backend {
 
     public createRoom(user: User, topic: string, members: string[]): Promise<Room> {
         let room = this.createRoomStub(topic, members);
+        this.roomsSubject.next(this.roomsSubject.value.concat([room]));
         return Promise.resolve(room);
+    }
+
+    public observeUserRooms(user: User): Observable<Room[]> {
+        return this.roomsSubject.asObservable();
+    }
+
+    public unsubscribeRoomsObservable(roomsObservable: Observable<Room[]>): void {
+        // nothing to do here
     }
 
     private generateId(): string {

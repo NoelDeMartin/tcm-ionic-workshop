@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 
+import { Observable }       from 'rxjs/Observable';
+import { BehaviorSubject }  from 'rxjs/BehaviorSubject';
+
 import FirebaseSDK  from 'firebase';
 import {
     User as FirebaseUser,
@@ -16,6 +19,8 @@ import { Backend }  from './Backend';
 export class FirebaseBackend extends Backend {
 
     private modelsFactory: ModelsFactory = new ModelsFactory();
+    private roomObservables: Observable<Room[]>[] = [];
+    private roomObservableUnsubcriptions: Function[] = [];
 
     public init(): Promise<void> {
 
@@ -144,6 +149,76 @@ export class FirebaseBackend extends Backend {
             .catch((error) => {
                 throw new Error(error.message);
             });
+    }
+
+    public observeUserRooms(user: User): Observable<Room[]> {
+
+        let roomsSubject = new BehaviorSubject<Room[]>([]);
+
+        let rooms: Room[] = [];
+        let unsubscribe =
+            FirebaseSDK
+                .firestore()
+                .collection('rooms')
+                .where('members.' + user.authId, '==', true)
+                .onSnapshot((snapshot: Firestore.QuerySnapshot) => {
+
+                    snapshot.docChanges.forEach((change: Firestore.DocumentChange) => {
+
+                        let room = this.modelsFactory.makeRoom(change.doc);
+                        let memberAuthIds = Object.keys(change.doc.data()['members']);
+
+                        this.loadUsers(memberAuthIds)
+                            .then(() => {
+
+                                if (change.type == 'added') {
+                                    rooms.push(room);
+                                }
+
+                                // TODO implement removed and modified changes
+
+                            });
+
+                    });
+
+                    roomsSubject.next(rooms.sort((a: Room, b: Room) => {
+                        return a.lastActiveAt > b.lastActiveAt ? -1 : 1;
+                    }));
+
+                });
+
+        let observable = roomsSubject.asObservable();
+
+        this.roomObservables.push(observable);
+        this.roomObservableUnsubcriptions.push(unsubscribe);
+
+        return observable;
+    }
+
+    public unsubscribeRoomsObservable(roomsObservable: Observable<Room[]>): void {
+
+        let index = this.roomObservables.indexOf(roomsObservable);
+
+        if (index !== -1) {
+            this.roomObservableUnsubcriptions[index]();
+            this.roomObservables.splice(index, 1);
+            this.roomObservableUnsubcriptions.splice(index, 1);
+        }
+
+    }
+
+    private loadUsers(memberAuthIds: string[]): Promise<void> {
+
+        let unloadedMemberAuthIds: string[] = memberAuthIds.filter((memberAuthId: string) => {
+            return !this.modelsFactory.hasLoadedUser(memberAuthId);
+        });
+
+        if (unloadedMemberAuthIds.length == 0) {
+            return Promise.resolve();
+        } else {
+            return this.findUsers('auth_id', unloadedMemberAuthIds).then(() => {});
+        }
+
     }
 
     private findUsers(field: string, values: any[]): Promise<User[]> {
