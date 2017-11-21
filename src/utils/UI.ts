@@ -78,6 +78,33 @@ class UI {
 
     }
 
+    public nextTick(callback: Function): void {
+        setTimeout(callback, 0);
+    }
+
+    public animate(
+        object: any,
+        property: string,
+        targetValue: number,
+        duration: number = 1000
+    ): void {
+
+        let startValue: number = object[property];
+        let start: number = Date.now();
+
+        let animationRenderFrame = () => {
+
+            let progress = Math.min((Date.now() - start) / duration, 1);
+            object[property] = startValue + (targetValue - startValue) * progress;
+
+            if (progress < 1) window.requestAnimationFrame(animationRenderFrame);
+
+        };
+
+        window.requestAnimationFrame(animationRenderFrame);
+
+    }
+
 }
 
 export default new UI();

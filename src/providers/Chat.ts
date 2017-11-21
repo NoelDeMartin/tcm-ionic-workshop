@@ -39,6 +39,13 @@ export class Chat implements AuthListener {
             });
     }
 
+    public sendMessage(room: Room, message: string): Promise<void> {
+
+        if (!this.auth.isLoggedIn()) return Promise.reject(new Error('User not authenticated'));
+
+        return this.backend.sendMessage(room, this.auth.getUser(), message);
+    }
+
     public onUserUpdated(user: User | null): void {
 
         if (this.roomsSubscription) {

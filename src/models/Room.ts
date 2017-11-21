@@ -54,6 +54,10 @@ export class Room {
             this.messages.splice(messageIndex, 1, message);
         }
 
+        this.messages.sort((a: Message, b: Message) => {
+            return a.date > b.date? 1 : -1;
+        });
+
     }
 
     public removeMessage(id: string): void {

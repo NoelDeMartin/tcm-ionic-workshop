@@ -1,5 +1,35 @@
 <page [title]="room.topic">
 
+    <div class="messages" #messages padding>
+
+        <div
+            *ngFor="let message of room.messages"
+            [ngClass]="{
+                'message': true,
+                'outgoing': message.author.authId == user.authId
+            }"
+        >
+
+            <div class="bubble">
+
+                <span class="author">
+                    {{ message.author.username }}
+                </span>
+
+                <span class="text">
+                    {{ message.text }}
+                </span>
+
+                <span class="info">
+                    {{ message.date.calendar() }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
     <ion-footer footer>
 
         <ion-toolbar>
