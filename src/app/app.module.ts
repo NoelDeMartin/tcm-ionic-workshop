@@ -38,7 +38,7 @@ import { registerInjector } from '../utils/injector';
 
 import { MyApp } from './app.component';
 
-let useOfflineBackend: boolean = true;
+let useOfflineBackend: boolean = false;
 
 @NgModule({
     declarations: [
