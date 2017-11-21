@@ -8,6 +8,7 @@ import { Backend }  from './Backend';
 export class Auth {
 
     private user: User;
+    private listeners: AuthListener[] = [];
 
     constructor(private backend: Backend) {}
 
@@ -15,7 +16,7 @@ export class Auth {
         return this.backend
             .getCurrentUser()
             .then((user: User | null) => {
-                this.user = user;
+                this.updateUser(user);
             });
     }
 
@@ -27,11 +28,15 @@ export class Auth {
         return this.user;
     }
 
+    public addListener(listener: AuthListener): void {
+        this.listeners.push(listener);
+    }
+
     public login(email: string, password: string): Promise<void> {
         return this.backend
             .login(email, password)
             .then((user: User) => {
-                this.user = user;
+                this.updateUser(user);
             });
     }
 
@@ -39,8 +44,24 @@ export class Auth {
         return this.backend
             .register(username, email, password)
             .then((user: User) => {
-                this.user = user;
+                this.updateUser(user);
             });
     }
+
+    private updateUser(user: User | null): void {
+
+        this.user = user;
+
+        for (let listener of this.listeners) {
+            listener.onUserUpdated(user);
+        }
+
+    }
+
+}
+
+export interface AuthListener {
+
+    onUserUpdated(user: User | null): void;
 
 }

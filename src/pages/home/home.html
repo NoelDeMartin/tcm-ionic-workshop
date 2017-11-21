@@ -1,7 +1,20 @@
-<page padding>
+<page>
 
-    <button ion-button block (click)="createRoom()">
-        Create Room
-    </button>
+    <ion-list>
+
+        <button ion-item
+            *ngFor="let room of roomsObservable | async"
+            (click)="openRoom(room)"
+        >
+            {{ room.topic }}
+        </button>
+
+    </ion-list>
+
+    <div padding>
+        <button ion-button block (click)="createRoom()">
+            Create Room
+        </button>
+    </div>
 
 </page>

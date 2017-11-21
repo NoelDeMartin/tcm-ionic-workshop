@@ -1,15 +1,32 @@
 import { Injectable }   from '@angular/core';
 
+import { Observable }       from 'rxjs/Observable';
+import { BehaviorSubject }  from 'rxjs/BehaviorSubject';
+import { Subscription }     from 'rxjs/Subscription';
+
 import { User } from '../models/User';
 import { Room } from '../models/Room';
 
-import { Auth }     from './Auth';
+import {
+    Auth,
+    AuthListener,
+}                   from './Auth';
 import { Backend }  from './Backend';
 
 @Injectable()
-export class Chat {
+export class Chat implements AuthListener {
 
-    constructor(private backend: Backend, private auth: Auth) {}
+    private roomsSubject: BehaviorSubject<Room[]> = new BehaviorSubject([]);
+    private roomsSubscription: Subscription = null;
+
+    constructor(private backend: Backend, private auth: Auth) {
+        auth.addListener(this);
+        this.onUserUpdated(this.auth.getUser());
+    }
+
+    public getRoomsObservable(): Observable<Room[]> {
+        return this.roomsSubject.asObservable();
+    }
 
     public createRoom(topic: string, memberUsernames: string[]): Promise<Room> {
 
@@ -20,6 +37,34 @@ export class Chat {
             .then((members: string[]) => {
                 return this.backend.createRoom(this.auth.getUser(), topic, members);
             });
+    }
+
+    public onUserUpdated(user: User | null): void {
+
+        if (this.roomsSubscription) {
+
+            this.roomsSubscription.unsubscribe();
+            this.roomsSubscription = null;
+
+            // TODO there is a memory leak here, even thou we have unsubscribed from the
+            // observable, Firebase is still listening for changes on the previous conditions.
+            // Keep that in mind for a production app.
+
+        }
+
+        if (user) {
+
+            this.roomsSubscription =
+                this.backend
+                    .observeUserRooms(user)
+                    .subscribe((rooms: Room[]) => {
+                        this.roomsSubject.next(rooms);
+                    });
+
+        } else {
+            this.roomsSubject.next([]);
+        }
+
     }
 
     private prepareRoomMembers(usernames: string[]): Promise<string[]> {
