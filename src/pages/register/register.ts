@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
 
-import {
-    NavController,
-    AlertController,
-    LoadingController,
-} from 'ionic-angular';
+import { NavController }    from 'ionic-angular';
 
 import { Auth } from '../../providers/Auth';
+
+import UI   from '../../utils/UI';
 
 import { HomePage } from '../home/home';
 
@@ -23,35 +21,27 @@ export class RegisterPage {
 
     constructor(
         private auth: Auth,
-        private navCtrl: NavController,
-        private alertCtrl: AlertController,
-        private loadingCtrl: LoadingController
+        private navCtrl: NavController
     ) {}
 
     public submit(): void {
 
         if (!this.valid()) {
-            this.showError('Invalid credentials');
+            UI.showError('Invalid credentials');
             return;
         }
 
-        let loader = this.loadingCtrl.create();
-        loader.present();
-
-        this.auth
-            .register(
-                this.username,
-                this.email,
-                this.password
-            )
-            .then(() => {
-                loader.dismiss();
-                this.navCtrl.setRoot(HomePage);
-            })
-            .catch((error: Error) => {
-                loader.dismiss();
-                this.showError(error.message);
-            });
+        UI.asyncOperation(
+            this.auth
+                .register(
+                    this.username,
+                    this.email,
+                    this.password
+                )
+                .then(() => {
+                    this.navCtrl.setRoot(HomePage);
+                })
+        );
 
     }
 
@@ -60,14 +50,6 @@ export class RegisterPage {
                 this.email.length > 8 &&
                 this.password.length > 8 &&
                 this.password == this.password_confirmation;
-    }
-
-    private showError(message: string) {
-        this.alertCtrl.create({
-            title: 'Error',
-            message: message,
-            buttons: ['OK']
-        }).present();
     }
 
 }

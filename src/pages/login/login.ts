@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
 
-import {
-    NavController,
-    AlertController,
-    LoadingController,
-} from 'ionic-angular';
+import { NavController }    from 'ionic-angular';
 
 import { Auth } from '../../providers/Auth';
+
+import UI   from '../../utils/UI';
 
 import { HomePage }     from '../home/home';
 import { RegisterPage } from '../register/register';
@@ -22,39 +20,21 @@ export class LoginPage {
 
     constructor(
         private auth: Auth,
-        private navCtrl: NavController,
-        private alertCtrl: AlertController,
-        private loadingCtrl: LoadingController
+        private navCtrl: NavController
     ) {}
 
     public submit(): void {
-
-        let loader = this.loadingCtrl.create();
-        loader.present();
-
-        this.auth
-            .login(this.email, this.password)
-            .then(() => {
-                loader.dismiss();
-                this.navCtrl.setRoot(HomePage);
-            })
-            .catch((error: Error) => {
-                loader.dismiss();
-                this.showError(error.message);
-            });
-
+        UI.asyncOperation(
+            this.auth
+                .login(this.email, this.password)
+                .then(() => {
+                    this.navCtrl.setRoot(HomePage);
+                })
+        );
     }
 
     public register(): void {
         this.navCtrl.push(RegisterPage);
-    }
-
-    private showError(message: string) {
-        this.alertCtrl.create({
-            title: 'Error',
-            message: message,
-            buttons: ['OK']
-        }).present();
     }
 
 }
