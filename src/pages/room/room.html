@@ -1,0 +1,24 @@
+<page [title]="room.topic">
+
+    <ion-footer footer>
+
+        <ion-toolbar>
+
+            <ion-input
+                placeholder="Write a message..."
+                [(ngModel)]="message"
+            ></ion-input>
+
+            <ion-buttons end>
+
+                <button ion-button color="primary" (click)="sendMessage()">
+                    Send
+                </button>
+
+            </ion-buttons>
+
+        </ion-toolbar>
+
+    </ion-footer>
+
+</page>

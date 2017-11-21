@@ -1,5 +1,7 @@
 import { Component }    from '@angular/core';
 
+import { NavController }    from 'ionic-angular';
+
 import { Observable }   from 'rxjs/Observable';
 
 import { Chat } from '../../providers/Chat';
@@ -7,6 +9,8 @@ import { Chat } from '../../providers/Chat';
 import UI   from '../../utils/UI';
 
 import { Room } from '../../models/Room';
+
+import { RoomPage } from '../room/room';
 
 import { CreateRoomModal }  from '../../modals/create-room/create-room';
 
@@ -18,7 +22,7 @@ export class HomePage {
 
     roomsObservable: Observable<Room[]>;
 
-    constructor(chat: Chat) {
+    constructor(private navCtrl: NavController, chat: Chat) {
         this.roomsObservable = chat.getRoomsObservable();
     }
 
@@ -27,7 +31,7 @@ export class HomePage {
     }
 
     public openRoom(room: Room): void {
-        // TODO
+        this.navCtrl.push(RoomPage, { room });
     }
 
 }
