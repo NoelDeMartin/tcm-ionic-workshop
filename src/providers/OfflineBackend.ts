@@ -5,8 +5,9 @@ import moment   from 'moment';
 import { Observable }   from 'rxjs/Observable';
 import { BehaviorSubject }  from 'rxjs/BehaviorSubject';
 
-import { User } from '../models/User';
-import { Room } from '../models/Room';
+import { User }     from '../models/User';
+import { Room }     from '../models/Room';
+import { Message }  from '../models/Message';
 
 import { Backend }  from './Backend';
 
@@ -25,13 +26,10 @@ export class OfflineBackend extends Backend {
         let john = this.createUserStub('John Doe');
 
         this.createRoom(this.user, 'Welcome!', [john.authId])
-
-        /*
             .then((room: Room) => {
                 this.sendMessage(room, john, 'Hi there I am jhon');
                 this.sendMessage(room, this.user, 'Hi there I am guest');
             });
-        */
 
         return Promise.resolve();
     }
@@ -58,6 +56,11 @@ export class OfflineBackend extends Backend {
         return Promise.resolve(room);
     }
 
+    public sendMessage(room: Room, author: User, text: string): Promise<void> {
+        room.addMessage(this.createMessageStub(author, text));
+        return Promise.resolve();
+    }
+
     public observeUserRooms(user: User): Observable<Room[]> {
         return this.roomsSubject.asObservable();
     }
@@ -76,6 +79,10 @@ export class OfflineBackend extends Backend {
 
     private createRoomStub(topic: string, members: string[] = []): Room {
         return new Room(this.generateId(), topic, moment(), members);
+    }
+
+    private createMessageStub(author: User, text: string): Message {
+        return new Message(this.generateId(), author, text, moment());
     }
 
 }

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import moment   from 'moment';
+
 import { Observable }       from 'rxjs/Observable';
 import { BehaviorSubject }  from 'rxjs/BehaviorSubject';
 
@@ -12,6 +14,7 @@ import 'firebase/firestore';
 
 import { User } from '../models/User';
 import { Room } from '../models/Room';
+import { Message }  from '../models/Message';
 
 import { Backend }  from './Backend';
 
@@ -151,10 +154,23 @@ export class FirebaseBackend extends Backend {
             });
     }
 
+    public sendMessage(room: Room, author: User, text: string): Promise<void> {
+        return FirebaseSDK
+            .firestore()
+            .collection('rooms')
+            .doc(room.id)
+            .collection('messages')
+            .add({
+                author: author.authId,
+                text: text,
+                date: new Date()
+            })
+            .then(() => {});
+    }
+
     public observeUserRooms(user: User): Observable<Room[]> {
 
         let roomsSubject = new BehaviorSubject<Room[]>([]);
-
         let rooms: Room[] = [];
         let unsubscribe =
             FirebaseSDK
@@ -172,7 +188,15 @@ export class FirebaseBackend extends Backend {
                             .then(() => {
 
                                 if (change.type == 'added') {
+
+                                    change.doc.ref
+                                        .collection('messages')
+                                        .onSnapshot((snapshot: Firestore.QuerySnapshot) => {
+                                            this.updateRoomMessages(room, snapshot);
+                                        });
+
                                     rooms.push(room);
+
                                 }
 
                                 // TODO implement removed and modified changes
@@ -219,6 +243,31 @@ export class FirebaseBackend extends Backend {
             return this.findUsers('auth_id', unloadedMemberAuthIds).then(() => {});
         }
 
+    }
+
+    private updateRoomMessages(room: Room, snapshot: Firestore.QuerySnapshot): void {
+        snapshot.docChanges.forEach((change: Firestore.DocumentChange) => {
+            switch (change.type) {
+                case 'added':
+                case 'modified': // fall through
+                    try {
+                        room.addMessage(this.modelsFactory.makeMessage(change.doc));
+                    } catch (e) {
+                        if (e instanceof UserNotLoaded) {
+                            this.loadUsers([e.userAuthId])
+                                .then(() => {
+                                    room.addMessage(this.modelsFactory.makeMessage(change.doc));
+                                });
+                        } else {
+                            throw e;
+                        }
+                    }
+                    break;
+                case 'removed':
+                    room.removeMessage(change.doc.id);
+                    break;
+            }
+        });
     }
 
     private findUsers(field: string, values: any[]): Promise<User[]> {
@@ -289,8 +338,35 @@ class ModelsFactory {
         return this.users[id];
     }
 
+    public makeMessage(snapshot: Firestore.DocumentSnapshot): Message {
+
+        let data = snapshot.data();
+
+        if (!this.hasLoadedUser(data['author'])) {
+            throw new UserNotLoaded(data['author']);
+        }
+
+        return new Message(
+            snapshot.id,
+            this.users[data['author']],
+            data['text'],
+            moment(data['date'])
+        );
+    }
+
     public hasLoadedUser(id: string): boolean {
         return id in this.users;
+    }
+
+}
+
+class UserNotLoaded extends Error {
+
+    public userAuthId: string;
+
+    constructor(userAuthId: string) {
+        super('User not loaded: ' + userAuthId);
+        this.userAuthId = userAuthId;
     }
 
 }

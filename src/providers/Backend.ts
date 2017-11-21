@@ -17,6 +17,8 @@ export abstract class Backend {
 
     abstract createRoom(user: User, topic: string, members: string[]): Promise<Room>;
 
+    abstract sendMessage(room: Room, author: User, text: string): Promise<void>;
+
     abstract observeUserRooms(user: User): Observable<Room[]>;
 
     abstract unsubscribeRoomsObservable(roomsObservable: Observable<Room[]>): void;
