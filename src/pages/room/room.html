@@ -1,4 +1,8 @@
-<page [title]="room.topic">
+<page
+    [subtitle]="room.memberIds.length + ' members'"
+    [title]="room.topic"
+    [actions]="actions"
+>
 
     <div class="messages" #messages padding>
 

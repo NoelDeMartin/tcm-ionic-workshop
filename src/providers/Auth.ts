@@ -48,6 +48,14 @@ export class Auth {
             });
     }
 
+    public logout(): Promise<void> {
+        return this.backend
+            .logout()
+            .then(() => {
+                this.updateUser(null);
+            });
+    }
+
     private updateUser(user: User | null): void {
 
         this.user = user;

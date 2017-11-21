@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { Platform } from 'ionic-angular';
-import { StatusBar } from '@ionic-native/status-bar';
+
+import { Platform }     from 'ionic-angular';
+import { StatusBar }    from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { SplashPage }   from '../pages/splash/splash';
@@ -11,7 +12,7 @@ import { Auth }     from '../providers/Auth';
 import { Backend }  from '../providers/Backend';
 
 @Component({
-  templateUrl: 'app.html'
+    templateUrl: 'app.html'
 })
 export class MyApp {
 
@@ -25,18 +26,22 @@ export class MyApp {
         splashScreen: SplashScreen
     ) {
 
+        // Init backend & auth services before starting the application.
         backend
             .init()
             .then(() => {
                 return auth.init();
             })
             .then(() => {
+                // SplashPage will be active until both of those services are loaded
+                // and depending on the status of the user (logged in or not), the
+                // first screen will HomePage or LoginPage.
                 this.rootPage = auth.isLoggedIn()? HomePage : LoginPage;
             });
 
+        // Once the platform is fully booted (this means the native application with
+        // cordova environment), native APIs and plugins will be available.
         platform.ready().then(() => {
-            // Okay, so the platform is ready and our plugins are available.
-            // Here you can do any higher level native things you might need.
             statusBar.styleDefault();
             splashScreen.hide();
         });
@@ -44,4 +49,3 @@ export class MyApp {
     }
 
 }
-

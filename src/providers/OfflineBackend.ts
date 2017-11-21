@@ -42,6 +42,11 @@ export class OfflineBackend extends Backend {
         return Promise.resolve(this.user = this.createUserStub());
     }
 
+    public logout(): Promise<void> {
+        this.user = null;
+        return Promise.resolve();
+    }
+
     public register(username: string, email: string, password: string): Promise<User> {
         return Promise.resolve(this.user = this.createUserStub(username));
     }
@@ -54,6 +59,13 @@ export class OfflineBackend extends Backend {
         let room = this.createRoomStub(topic, members);
         this.roomsSubject.next(this.roomsSubject.value.concat([room]));
         return Promise.resolve(room);
+    }
+
+    public addRoomMembers(room: Room, members: string[]): Promise<void> {
+        for (let member of members) {
+            room.addMember(member);
+        }
+        return Promise.resolve();
     }
 
     public sendMessage(room: Room, author: User, text: string): Promise<void> {

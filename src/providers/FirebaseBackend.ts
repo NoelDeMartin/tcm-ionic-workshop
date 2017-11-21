@@ -89,6 +89,15 @@ export class FirebaseBackend extends Backend {
             });
     }
 
+    public logout(): Promise<void> {
+        return FirebaseSDK
+            .auth()
+            .signOut()
+            .catch((error) => {
+                throw new Error(error.message);
+            });
+    }
+
     public register(username: string, email: string, password: string): Promise<User> {
 
         let authUser: FirebaseUser;
@@ -151,6 +160,32 @@ export class FirebaseBackend extends Backend {
             })
             .catch((error) => {
                 throw new Error(error.message);
+            });
+    }
+
+    public addRoomMembers(room: Room, members: string[]): Promise<void> {
+
+        let firebaseMembers = {};
+
+        for (let member of members) {
+            firebaseMembers[member] = true;
+        }
+
+        for (let member of room.memberIds) {
+            firebaseMembers[member] = true;
+        }
+
+        return FirebaseSDK
+            .firestore()
+            .collection('rooms')
+            .doc(room.id)
+            .update({
+                members: firebaseMembers
+            })
+            .then(() => {
+                for (let member of members) {
+                    room.addMember(member);
+                }
             });
     }
 

@@ -7,6 +7,15 @@ import {
 
 import { resolveDependency }    from './injector';
 
+/**
+ * This class will act as a singleton with common UI patterns used throughout
+ * the app.
+ *
+ * This approach is an alternative to using providers, and although it removes
+ * some of the flexibility of using providers, it adds the convenience of being
+ * imported and used directly, instead of being injected into a class with all
+ * the writing that involves.
+ */
 class UI {
 
     private loader: Loading;
@@ -14,6 +23,10 @@ class UI {
     private modalCtrl: ModalController;
     private loadingCtrl: LoadingController;
 
+    /**
+     * This is used to wrap any async operation which needs to block the
+     * UI with a loader.
+     */
     asyncOperation(promise: Promise<any>): Promise<any> {
 
         this.showLoading();
@@ -78,10 +91,20 @@ class UI {
 
     }
 
+    /**
+     * Run some code after Angular's change detection. This is important
+     * if any actions needs to directly manipulate DOM state.
+     *
+     * More information about angular's tick: https://angular.io/api/core/ApplicationRef#!#tick-anchor
+     */
     public nextTick(callback: Function): void {
         setTimeout(callback, 0);
     }
 
+    /**
+     * There are multiple libraries available to animate properties in different ways,
+     * but sometimes a simple implementation such as this can get the job done.
+     */
     public animate(
         object: any,
         property: string,

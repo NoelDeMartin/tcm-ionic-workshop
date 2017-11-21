@@ -8,21 +8,24 @@ import { BrowserModule }  from '@angular/platform-browser';
 
 import {
     IonicApp,
+    IonicModule,
     IonicErrorHandler,
-    IonicModule
 }                       from 'ionic-angular';
-import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar }    from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { HomePage }     from '../pages/home/home';
-import { LoginPage }    from '../pages/login/login';
 import { RoomPage }     from '../pages/room/room';
+import { LoginPage }    from '../pages/login/login';
 import { SplashPage }   from '../pages/splash/splash';
 import { RegisterPage } from '../pages/register/register';
 
 import { CreateRoomModal }  from '../modals/create-room/create-room';
 
-import { Page }     from '../components/page/page';
+import {
+    Page,
+    OptionsMenu,
+}                   from '../components/page/page';
 import { Modal }    from '../components/modal/modal';
 
 import { Auth }             from '../providers/Auth';
@@ -46,6 +49,7 @@ let useOfflineBackend: boolean = true;
         RoomPage,
         LoginPage,
         SplashPage,
+        OptionsMenu,
         RegisterPage,
         CreateRoomModal,
     ],
@@ -62,6 +66,7 @@ let useOfflineBackend: boolean = true;
         HomePage,
         LoginPage,
         SplashPage,
+        OptionsMenu,
         RegisterPage,
         CreateRoomModal,
     ],
@@ -72,7 +77,11 @@ let useOfflineBackend: boolean = true;
         StatusBar,
         SplashScreen,
         { provide: ErrorHandler, useClass: IonicErrorHandler },
+
+        // Backend implementation can be changed using dependency injection,
+        // try using OfflineBackend for an offline implementation with stubs.
         { provide: Backend, useClass: useOfflineBackend? OfflineBackend : FirebaseBackend }
+
     ]
 })
 export class AppModule {}

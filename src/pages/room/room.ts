@@ -4,7 +4,10 @@ import {
     ElementRef,
 } from '@angular/core';
 
-import { NavParams } from 'ionic-angular';
+import {
+    NavParams,
+    AlertController,
+} from 'ionic-angular';
 
 import { Chat } from '../../providers/Chat';
 import { Auth } from '../../providers/Auth';
@@ -15,6 +18,8 @@ import {
     Room,
     RoomListener,
 } from '../../models/Room';
+
+import { PageAction }   from '../../components/page/page';
 
 import UI   from '../../utils/UI';
 
@@ -29,15 +34,25 @@ export class RoomPage implements RoomListener {
     user: User;
     room: Room;
 
+    actions: PageAction[] = [];
+
     message: string = '';
 
     constructor(
+        private alertCtrl: AlertController,
         private chat: Chat,
         auth: Auth,
         params: NavParams
     ) {
+
         this.user = auth.getUser();
         this.room = params.get('room');
+
+        this.actions.push({
+            icon: 'person-add',
+            callback: this.addMember.bind(this)
+        });
+
     }
 
     ionViewDidEnter() {
@@ -52,6 +67,32 @@ export class RoomPage implements RoomListener {
     public sendMessage(): void {
         this.chat.sendMessage(this.room, this.message);
         this.message = '';
+    }
+
+    public addMember(): void {
+        this.alertCtrl.create({
+            title: 'Add member',
+            inputs: [
+                {
+                    name: 'username',
+                    placeholder: 'Member username'
+                }
+            ],
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel'
+                },
+                {
+                    text: 'Add',
+                    handler: ({ username }) => {
+                        UI.asyncOperation(
+                            this.chat.addRoomMember(this.room, username)
+                        );
+                    }
+                }
+            ]
+        }).present();
     }
 
     public onNewMessage(message: Message): void {

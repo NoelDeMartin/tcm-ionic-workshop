@@ -1,4 +1,4 @@
-<page>
+<page [options]="options" [actions]="actions">
 
     <ion-list>
 
@@ -9,12 +9,10 @@
             {{ room.topic }}
         </button>
 
-    </ion-list>
+        <ion-item *ngIf="(roomsObservable | async).length == 0">
+            You have no rooms, create one!
+        </ion-item>
 
-    <div padding>
-        <button ion-button block (click)="createRoom()">
-            Create Room
-        </button>
-    </div>
+    </ion-list>
 
 </page>

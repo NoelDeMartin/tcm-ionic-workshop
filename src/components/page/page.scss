@@ -1,0 +1,25 @@
+$toolbar-subtitle-margin: 4px;
+$toolbar-subtitle-font-size: 1.3rem;
+
+page ion-title.has-subtitle .toolbar-title {
+    position: relative;
+    padding-bottom: calc(#{$toolbar-subtitle-font-size} + #{$toolbar-subtitle-margin});
+
+    .subtitle {
+        position: absolute;
+        opacity: 0.9;
+        font-size: $toolbar-subtitle-font-size;
+    }
+
+    &.toolbar-title-md .subtitle {
+        left: 12px;
+        top: calc(#{$toolbar-md-title-font-size} + #{$toolbar-subtitle-margin});
+    }
+
+    &.toolbar-title-ios .subtitle {
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(#{$toolbar-ios-title-font-size} + #{$toolbar-subtitle-margin});
+    }
+
+}

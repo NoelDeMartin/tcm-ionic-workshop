@@ -34,6 +34,12 @@ export class Room {
 
     }
 
+    public addMember(id: string): void {
+        if (this.memberIds.indexOf(id) === -1) {
+            this.memberIds.push(id);
+        }
+    }
+
     public addMessage(message: Message): void {
 
         let messageIds = this.messages.map((message: Message) => {
