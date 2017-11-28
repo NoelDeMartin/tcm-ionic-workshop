@@ -31,3 +31,7 @@ node_modules/.bin/ionic serve
 If you see the following after running the commands above, you should be ready for the workshop.
 
 ![Ionic Blank Screenshot](ionic-blank.png "Ionic Blank Application")
+
+## Slides
+
+Workshop slides can be found [here](https://www.slideshare.net/NoelDeMartinFernande/tcm-ionic-workshop).
