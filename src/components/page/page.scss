@@ -1,6 +1,12 @@
 $toolbar-subtitle-margin: 4px;
 $toolbar-subtitle-font-size: 1.3rem;
 
+// Fixes a bug with custom components as page root:
+// https://forum.ionicframework.com/t/adding-custom-component-removes-margin-top-from-scroll-content/59497/2
+page .scroll-content {
+	margin-top: 56px !important;
+}
+
 page ion-title.has-subtitle .toolbar-title {
     position: relative;
     padding-bottom: calc(#{$toolbar-subtitle-font-size} + #{$toolbar-subtitle-margin});
