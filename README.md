@@ -34,4 +34,4 @@ If you see the following after running the commands above, you should be ready f
 
 ## Slides
 
-Workshop slides can be found [here](https://www.slideshare.net/NoelDeMartinFernande/tcm-ionic-workshop).
+Workshop slides can be found [here](https://www.slideshare.net/NoelDeMartinFernande/tcm-ionic-workshop-83042360).
